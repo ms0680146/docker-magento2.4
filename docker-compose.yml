@@ -1,0 +1,54 @@
+version: '3'
+services:
+  web:
+    image: webdevops/php-apache:7.4
+    container_name: web
+    restart: always
+    user: application
+    environment:
+      - WEB_ALIAS_DOMAIN=magento-test.com
+      - WEB_DOCUMENT_ROOT=/app/pub
+      - PHP_DATE_TIMEZONE=EST
+      - PHP_DISPLAY_ERRORS=1
+      - PHP_MEMORY_LIMIT=2048M
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_POST_MAX_SIZE=500M
+      - PHP_UPLOAD_MAX_FILESIZE=1024M
+    volumes:
+      - "./:/app"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "32823:22"
+    links:
+      - mysql
+      - elasticsearch
+  mysql:
+    image: mariadb:10.4
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=magento
+    volumes:
+      - maria-db:/var/lib/mysql
+  elasticsearch:
+    image: elasticsearch:7.8.1
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+volumes:
+    maria-db:
+      external: false
+    elasticsearch-data:
+      external: false
