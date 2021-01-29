@@ -37,6 +37,7 @@ services:
   elasticsearch:
     image: elasticsearch:7.8.1
     container_name: elasticsearch
+    restart: always
     ports:
       - "9200:9200"
     environment:
